@@ -49,6 +49,7 @@ export interface SaleRecord {
   pipelineId: string;
   commercialName: string; // Mapeia para Company Name
   source: 'Facebook' | 'Instagram' | 'Meta Ads' | 'Google' | 'Direct';
+  observations?: string; // Novo campo solicitado
   
   // Relacionamentos estendidos
   contact?: Contact;

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
   Phone, MessageSquare, Mail, MoreHorizontal, 
   Trash2, Edit3, TrendingUp, DollarSign,
-  AlertCircle, CheckCircle2, Star
+  AlertCircle, CheckCircle2, Star, Info, Clock
 } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { SaleRecord } from '../types';
@@ -37,35 +37,34 @@ const KanbanCard: React.FC<{
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`bg-white rounded-[32px] p-6 mb-6 border border-slate-100 shadow-sm hover:shadow-3xl transition-all group relative ring-1 ring-slate-50 ${snapshot.isDragging ? 'dragging shadow-4xl ring-8 ring-[#6d47df]/10 rotate-2 z-[200]' : 'z-10'}`}
+          className={`bg-white rounded-[20px] p-3.5 mb-3 border border-slate-100 shadow-sm hover:shadow-lg transition-all group relative ring-1 ring-slate-50/50 ${snapshot.isDragging ? 'dragging shadow-2xl ring-2 ring-[#6d47df]/20 z-[200]' : 'z-10'}`}
         >
-          {/* Header do Card */}
-          <div className="flex justify-between items-start mb-5">
-            <div>
-               <h4 className="text-sm font-black text-slate-900 leading-tight tracking-tight">{lead.owner}</h4>
-               <p className="text-[10px] font-bold text-slate-400 mt-0.5">{lead.commercialName}</p>
+          {/* Header Compacto */}
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex-1 overflow-hidden">
+               <h4 className="text-[12px] font-black text-slate-900 leading-tight tracking-tight truncate">{lead.owner}</h4>
+               <p className="text-[9px] font-bold text-slate-400 mt-0.5 truncate uppercase tracking-tighter">{lead.commercialName}</p>
             </div>
             <div className="relative">
               <button 
                 onClick={(e) => { e.stopPropagation(); setShowActions(!showActions); }}
-                className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${showActions ? 'bg-[#6d47df] text-white' : 'hover:bg-slate-100 text-slate-400'}`}
+                className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${showActions ? 'bg-[#6d47df] text-white' : 'hover:bg-slate-50 text-slate-300'}`}
               >
-                <MoreHorizontal size={20} />
+                <MoreHorizontal size={14} />
               </button>
               
               {showActions && (
                 <>
                   <div className="fixed inset-0 z-[210]" onClick={() => setShowActions(false)}></div>
-                  <div className="absolute right-0 top-12 w-60 bg-white rounded-3xl shadow-4xl border border-slate-100 z-[220] py-4 ring-1 ring-slate-200 animate-in overflow-hidden">
-                    <button onClick={() => { onEdit(lead); setShowActions(false); }} className="w-full flex items-center gap-4 px-6 py-4 text-xs font-black text-slate-700 hover:bg-slate-50 transition-colors">
-                      <Edit3 size={18} className="text-[#6d47df]" /> Editar Negócio
+                  <div className="absolute right-0 top-8 w-40 bg-white rounded-xl shadow-2xl border border-slate-100 z-[220] py-1.5 ring-1 ring-slate-200 animate-in overflow-hidden">
+                    <button onClick={() => { onEdit(lead); setShowActions(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-black text-slate-700 hover:bg-slate-50 transition-colors">
+                      <Edit3 size={12} className="text-[#6d47df]" /> Editar
                     </button>
-                    <div className="h-px bg-slate-100 mx-4 my-1"></div>
                     <button 
-                      onClick={(e) => { e.stopPropagation(); if(confirm('Excluir este lead permanentemente?')) { onDelete(lead.id); setShowActions(false); } }} 
-                      className="w-full flex items-center gap-4 px-6 py-4 text-xs font-black text-rose-500 hover:bg-rose-50 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); if(confirm('Excluir este registro?')) { onDelete(lead.id); setShowActions(false); } }} 
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-[10px] font-black text-rose-500 hover:bg-rose-50 transition-colors"
                     >
-                      <Trash2 size={18} /> Excluir do Pipeline
+                      <Trash2 size={12} /> Excluir
                     </button>
                   </div>
                 </>
@@ -73,33 +72,42 @@ const KanbanCard: React.FC<{
             </div>
           </div>
           
-          {/* Valor e Score */}
-          <div className="flex items-center justify-between mb-6">
-             <span className="text-lg font-black text-[#6d47df]">{formatCurrency(lead.amount)}</span>
-             <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-tighter ${getScoreColor(lead.score)}`}>
-                <Star size={12} fill="currentColor" /> {lead.score}% Score
+          <div className="flex items-center justify-between mb-3">
+             <span className="text-[14px] font-black text-[#6d47df] tracking-tighter">{formatCurrency(lead.amount)}</span>
+             <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md font-black text-[8px] uppercase tracking-tighter ${getScoreColor(lead.score)}`}>
+                <Star size={8} fill="currentColor" /> {lead.score}%
              </div>
           </div>
 
-          {/* Atividades Recentes */}
-          <div className="bg-slate-50/50 rounded-2xl p-4 mb-6 border border-slate-100/50">
-             <div className="flex items-center gap-2 mb-2">
-                <AlertCircle size={10} className="text-amber-500" />
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Última Ação</span>
-             </div>
-             <p className="text-[10px] font-bold text-slate-600 line-clamp-1 italic">"{lead.activities[0]?.description || 'Sem histórico'}"</p>
-          </div>
-
-          {/* Footer do Card com Contatos Rápidos */}
-          <div className="flex items-center justify-between pt-5 border-t border-slate-50">
-            <div className="flex gap-4">
-               <Phone size={18} className="text-slate-300 hover:text-[#6d47df] cursor-pointer transition-colors" />
-               <MessageSquare size={18} className="text-slate-300 hover:text-[#6d47df] cursor-pointer transition-colors" />
-               <Mail size={18} className="text-slate-300 hover:text-[#6d47df] cursor-pointer transition-colors" />
+          {/* Campo de Observação Visível no Card */}
+          {lead.observations ? (
+            <div className="bg-blue-50/40 rounded-lg p-2.5 mb-3 border border-blue-100/20">
+               <div className="flex items-center gap-1.5 mb-1 opacity-70">
+                  <Info size={9} className="text-blue-500" />
+                  <span className="text-[7px] font-black text-blue-500 uppercase tracking-[1px]">Observação</span>
+               </div>
+               <p className="text-[9px] font-bold text-slate-600 line-clamp-2 leading-snug italic">"{lead.observations}"</p>
             </div>
-            {lead.status === 'Won' && (
-              <div className="bg-emerald-500 text-white p-2 rounded-xl shadow-lg shadow-emerald-500/20" title="Venda Ganha">
-                <CheckCircle2 size={16} />
+          ) : (
+            <div className="bg-slate-50/50 rounded-lg p-2.5 mb-3 border border-slate-100/30">
+               <div className="flex items-center gap-1.5 mb-1 opacity-40">
+                  <Clock size={9} className="text-slate-400" />
+                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-[1px]">Status</span>
+               </div>
+               <p className="text-[9px] font-bold text-slate-400 line-clamp-1 truncate italic">"{lead.activities[0]?.description || 'Sem histórico'}"</p>
+            </div>
+          )}
+
+          {/* Ações Rápidas */}
+          <div className="flex items-center justify-between pt-2.5 border-t border-slate-50">
+            <div className="flex gap-2.5">
+               <Phone size={13} className="text-slate-200 hover:text-[#6d47df] cursor-pointer transition-colors" />
+               <MessageSquare size={13} className="text-slate-200 hover:text-[#6d47df] cursor-pointer transition-colors" />
+               <Mail size={13} className="text-slate-200 hover:text-[#6d47df] cursor-pointer transition-colors" />
+            </div>
+            {lead.stage === 'Concluído' && (
+              <div className="bg-emerald-500 text-white p-0.5 rounded-md shadow-sm">
+                <CheckCircle2 size={10} />
               </div>
             )}
           </div>
@@ -121,53 +129,56 @@ const KanbanBoard: React.FC<KanbanProps> = ({ data, onMove, onEdit, onDelete }) 
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex gap-10 overflow-x-auto pb-20 items-start -mx-12 px-12" style={{ width: 'calc(100% + 100px)' }}>
-        {columns.map(column => {
-          const leadsInColumn = data.filter(d => d.stage === column);
-          const columnValue = leadsInColumn.reduce((acc, curr) => acc + curr.amount, 0);
-          const isSuccess = column === 'Pago' || column === 'Fechado';
-          
-          return (
-            <div key={column} className="flex-shrink-0 w-[360px]">
-              <div className="flex flex-col mb-8 px-6">
-                  <div className="flex items-center justify-between">
-                     <h3 className={`text-[13px] font-black uppercase tracking-[4px] ${isSuccess ? 'text-emerald-500' : 'text-slate-900'}`}>{column}</h3>
-                     <span className={`text-[10px] px-3 py-1 rounded-full font-black ${isSuccess ? 'bg-emerald-500 text-white' : 'bg-[#6d47df] text-white shadow-lg'}`}>
-                       {leadsInColumn.length}
-                     </span>
-                  </div>
-                  <p className="text-[12px] text-slate-400 font-black mt-2 tracking-tighter">Budget Total: {formatCurrency(columnValue)}</p>
+      <div className="overflow-x-auto pb-6 -mx-6 px-6 no-scrollbar custom-scroll-area">
+        <div className="flex gap-4 items-start min-w-max">
+          {columns.map(column => {
+            const leadsInColumn = data.filter(d => d.stage === column);
+            const columnValue = leadsInColumn.reduce((acc, curr) => acc + curr.amount, 0);
+            const isFinished = column === 'Concluído';
+            
+            return (
+              <div key={column} className="flex-shrink-0 w-[240px]">
+                <div className="flex flex-col mb-3 px-1.5">
+                    <div className="flex items-center justify-between mb-0.5">
+                       <h3 className={`text-[9px] font-black uppercase tracking-[1.5px] ${isFinished ? 'text-emerald-500' : 'text-slate-900'}`}>{column}</h3>
+                       <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black ${isFinished ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                         {leadsInColumn.length}
+                       </span>
+                    </div>
+                    <div className="h-[1px] w-full bg-slate-200/50 mb-1"></div>
+                    <p className="text-[9px] text-slate-400 font-bold tracking-tight">{formatCurrency(columnValue)}</p>
+                </div>
+                
+                <Droppable droppableId={column}>
+                  {(provided, snapshot) => (
+                    <div 
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className={`rounded-[24px] p-2 border transition-all duration-300 min-h-[550px] ${snapshot.isDraggingOver ? 'bg-[#6d47df]/5 border-[#6d47df]/10' : 'bg-slate-100/10 border-slate-200/10'}`}
+                    >
+                      {leadsInColumn.map((lead, index) => (
+                        <KanbanCard 
+                          key={lead.id} 
+                          lead={lead} 
+                          index={index}
+                          onEdit={onEdit} 
+                          onDelete={onDelete} 
+                        />
+                      ))}
+                      {provided.placeholder}
+                      {leadsInColumn.length === 0 && !snapshot.isDraggingOver && (
+                        <div className="h-32 flex flex-col items-center justify-center text-slate-200 border-2 border-dashed border-slate-200/20 rounded-[20px] m-1">
+                            <TrendingUp size={20} className="mb-2 opacity-5" />
+                            <span className="text-[7px] font-black uppercase tracking-[1px] opacity-10">Mover para cá</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Droppable>
               </div>
-              
-              <Droppable droppableId={column}>
-                {(provided, snapshot) => (
-                  <div 
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className={`kanban-column rounded-[48px] p-4 border transition-all duration-500 min-h-[700px] ${snapshot.isDraggingOver ? 'bg-[#6d47df]/5 shadow-inner border-[#6d47df]/20 scale-[1.01]' : 'bg-slate-100/20 border-slate-200/40'}`}
-                  >
-                    {leadsInColumn.map((lead, index) => (
-                      <KanbanCard 
-                        key={lead.id} 
-                        lead={lead} 
-                        index={index}
-                        onEdit={onEdit} 
-                        onDelete={onDelete} 
-                      />
-                    ))}
-                    {provided.placeholder}
-                    {leadsInColumn.length === 0 && !snapshot.isDraggingOver && (
-                      <div className="h-80 flex flex-col items-center justify-center text-slate-300 border-4 border-dashed border-slate-200/50 rounded-[40px] m-4 animate-pulse">
-                          <TrendingUp size={48} className="mb-6 opacity-10" />
-                          <span className="text-[11px] font-black uppercase tracking-[3px] opacity-20 text-center px-10">Mover Oportunidade Aqui</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </Droppable>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </DragDropContext>
   );
